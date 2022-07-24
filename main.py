@@ -34,6 +34,7 @@ def main():
     loadImages()
 
     end = False
+    legalMoves = []
     squareSelected = ()  # Keep track of last user click
     playerClicks = []  # Keep track of player clicks: two tuple [(startRow, startColumn), (endRow, end Column)]
     while not end:
@@ -60,13 +61,29 @@ def main():
                         printMessage(screen, "Invalid Piece")
                         squareSelected = ()
                         playerClicks = []
+                        continue
+
+                    # highlight the pieces that the places that the highlighted piece can go
+                    startPosition = moveRelay(playerClicks[0])
+                    legalMoves = board.legalMoves(startPosition)
+                    if legalMoves:
+                        for move in legalMoves:
+                            translatedMove = coordinatesToScreen(move)
+                            highlightSquare(
+                                screen,
+                                (0, 191, 255, 100),
+                                translatedMove[0],
+                                translatedMove[1]
+                            )
+                        pygame.display.flip()
+                        time.sleep(0.3)
 
                 if len(playerClicks) == 2:  # if this is the second input, make a move
                     startPosition = moveRelay(playerClicks[0])
                     endPosition = moveRelay(playerClicks[1])  # flip rows of positions
 
-                    moves = board.legalMoves(startPosition)
-                    if [endPosition.rank, endPosition.file] not in moves:
+                    legalMoves = board.legalMoves(startPosition)
+                    if [endPosition.rank, endPosition.file] not in legalMoves:
                         printMessage(screen, "Invalid Move")
                         squareSelected = ()
                         playerClicks = []
@@ -93,6 +110,21 @@ def main():
                         )
                     pygame.display.flip()
                     time.sleep(0.75)
+                if e.key == pygame.K_e:  # e keybord to show all possible moves for a piece:
+                    if len(playerClicks) == 1:
+                        startPosition = moveRelay(playerClicks[0])
+                        legalMoves = board.legalMoves(startPosition)
+                        if legalMoves:
+                            for move in legalMoves:
+                                translatedMove = coordinatesToScreen(move)
+                                highlightSquare(
+                                    screen,
+                                    (0, 191, 255, 200),
+                                    translatedMove[0],
+                                    translatedMove[1]
+                                )
+                            pygame.display.flip()
+                            time.sleep(0.75)
 
         drawGameBoard(screen, board)
         clock.tick(MAX_FPS)

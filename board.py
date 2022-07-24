@@ -104,7 +104,7 @@ class Board(Resource):
                 targetPiece = self.matrix[move[0]][move[1]]
                 if blockedMoves:
                     break
-                if not targetPiece.team:
+                if targetPiece.representation == "--":
                     legalMoves.append(move)
                     continue
                 blockedMoves = True
