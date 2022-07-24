@@ -80,6 +80,9 @@ def main():
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_z:  # z keybord to undo
                     board.undoMove()
+                if e.key == pygame.K_w:  # w keybord to show moves
+                    highlightSquare(screen, (255, 140, 0, 200), 1, 1)
+                    time.sleep(0.25)
 
         drawGameBoard(screen, board)
         clock.tick(MAX_FPS)
@@ -89,13 +92,6 @@ def main():
 def drawGameBoard(screen, board):
     drawBoardFrame(screen)
     drawPieces(screen, board.matrix)
-
-
-def printMessage(screen, message):
-    textSurface = GAME_FONT.render(message, True, pygame.Color("black"), pygame.Color("dark gray"))
-    screen.blit(textSurface, dest=(2.5 * SQ_SIZE, 3.75 * SQ_SIZE))
-    pygame.display.flip()
-    time.sleep(0.2)
 
 
 def drawBoardFrame(screen):
@@ -123,6 +119,21 @@ def drawPieces(screen, matrix):
                     IMAGES[piece],
                     pygame.Rect(column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE)
                 )
+
+
+def printMessage(screen, message):
+    textSurface = GAME_FONT.render(message, True, pygame.Color("black"), pygame.Color("dark gray"))
+    screen.blit(textSurface, dest=(2.5 * SQ_SIZE, 3.75 * SQ_SIZE))
+    pygame.display.flip()
+    time.sleep(0.2)
+
+
+def highlightSquare(screen, color, row, column):
+    rect = column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE
+    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+    screen.blit(shape_surf, rect)
+    pygame.display.flip()
 
 
 if __name__ == "__main__":
