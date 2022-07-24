@@ -33,7 +33,6 @@ def main():
     loadImages()
 
     end = False
-    team = "White"
     squareSelected = ()  # Keep track of last user click
     playerClicks = []  # Keep track of player clicks: two tuple [(startRow, startColumn), (endRow, end Column)]
     while not end:
@@ -54,7 +53,7 @@ def main():
                     playerClicks.append(squareSelected)
 
                 if len(playerClicks) == 1:  # if a piece was selected to be moved
-                    pieces = board.getMobilePiecesPosition(team)  # check if piece is a valid piece to be moved
+                    pieces = board.getMobilePiecesPosition(board.team)  # check if piece is a valid piece to be moved
                     startPosition = moveRelay(playerClicks[0])  # translate the position
                     if [startPosition.rank, startPosition.file] not in pieces:
                         printMessage(screen, "Invalid Piece")
@@ -73,7 +72,7 @@ def main():
                         continue
 
                     board.movePiece(startPosition, endPosition)
-                    team = flipTeam(team)
+                    board.resetTeam()
                     squareSelected = ()
                     playerClicks = []
 

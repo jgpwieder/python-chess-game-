@@ -52,15 +52,6 @@ def setEmptyRank(rank):
     return rankList
 
 
-def getOtherTeam(team):
-    otherTeam = "Black"
-    if team == "Black":
-        otherTeam = "White"
-    if not team:
-        return None
-    return otherTeam
-
-
 def formatMove(startPosition, endPosition):
     start = translateMove([startPosition.rank, startPosition.file])
     end = translateMove([endPosition.rank, endPosition.file])
@@ -98,3 +89,12 @@ def getPawnDiagonal(matrix, piece, position):
             if leftPiece.team == otherTeam:
                 legalMoves.append(move)
     return legalMoves
+
+
+def getOtherTeam(team):
+    otherTeam = "Black"
+    if team == "Black":
+        otherTeam = "White"
+    if not team:
+        return None
+    return otherTeam

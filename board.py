@@ -1,17 +1,43 @@
+import copy
 from position import Position
 from resource import Resource
 from utilsBoard import freshBoard, getPawnDiagonal, formatMove
-from pieces import Pawn, Horse, Bishop, Rook, King, Queen, Empty
+from pieces import Empty
 
 
 class Board(Resource):
-
+    """ Board object:
+        - matrix [nested list] list of ranks. Ranks are lists of pieces
+        - capturedPieces [list of pieces]: list of pieces that were captured with the position that they were captured
+        - movedPieces [list of pieces]: list of pieces that moved with the start position
+        - moveLog [list of strings]: list of strings that represent every move
+    """
     def __init__(self):
         self.matrix = freshBoard()
+        self.capturedPieces = []
+        self.movedPieces = []
         self.moveLog = []
+        self.team = "White"
 
-    def writeToLog(self, move):
+    def resetTeam(self):
+        otherTeam = "Black"
+        if self.team == "Black":
+            otherTeam = "White"
+        self.team = otherTeam
+
+    """Set the log, movedPieces and capturedPieces. Called in the movePiece method"""
+    def registerMove(self, move, startPosition, movedPiece, capturedPiece):
+        movPiece = copy.deepcopy(movedPiece)
+        movPiece.position = startPosition  # Reset the location of the moved piece for storage
         self.moveLog.append(move)
+        self.capturedPieces.append(capturedPiece)
+        self.movedPieces.append(movPiece)
+        # for piece in self.capturedPieces:
+        #     print("captured:")
+        #     print(piece)
+        # for piece in self.movedPieces:
+        #     print("moved:")
+        #     print(piece)
 
     def recalculateBoard(self):
         for row in range(0, 8):
@@ -29,13 +55,33 @@ class Board(Resource):
         # Get the info from the piece, change its position and recalculate moves:
         movedPiece = self.getPiece(startPosition)
         movedPiece.position = endPosition
+        capturedPiece = self.matrix[endPosition.rank][endPosition.file]
+
         # Empty the startPosition and set the end position:
         self.matrix[startPosition.rank][startPosition.file] = Empty(startPosition)
         self.matrix[endPosition.rank][endPosition.file] = movedPiece
+
+        # Register the move to the log and also store the pieces involved on the board state
         chessNotationMove = formatMove(startPosition, endPosition)
-        self.writeToLog(chessNotationMove)
+        self.registerMove(
+            chessNotationMove,
+            startPosition,
+            movedPiece,
+            capturedPiece
+        )
+
         print(chessNotationMove)
         self.recalculateBoard()
+
+    def undoMove(self):
+        if len(self.moveLog) != 0:
+            movedPiece = self.movedPieces.pop()
+            capturedPiece = self.capturedPieces.pop()
+            self.matrix[movedPiece.position.rank][movedPiece.position.file] = movedPiece
+            self.matrix[capturedPiece.position.rank][capturedPiece.position.file] = capturedPiece
+            self.resetTeam()
+            print("UNDO")
+            self.recalculateBoard()
 
     # this functions goes to the piece on the start position and checks if the
     # possible moves it has are legal in respect to the rest of the board
