@@ -82,6 +82,7 @@ class Board(Resource):
             self.resetTeam()
             print("UNDO")
             self.recalculateBoard()
+            self.moveLog.pop()
 
     # this functions goes to the piece on the start position and checks if the
     # possible moves it has are legal in respect to the rest of the board

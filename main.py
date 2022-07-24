@@ -76,6 +76,11 @@ def main():
                     squareSelected = ()
                     playerClicks = []
 
+            # Keyboard handlers:
+            elif e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_z:  # z keybord to undo
+                    board.undoMove()
+
         drawGameBoard(screen, board)
         clock.tick(MAX_FPS)
         pygame.display.flip()
