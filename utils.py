@@ -36,6 +36,13 @@ def translateMoves(moves):
     return strMoves
 
 
+def coordinatesToScreen(coordinates):
+    # Two flips were required to math the board matrix to pygame:
+    # Here I had to flip the rows of the input since in the method
+    # drawPieces I had to flip the rows
+    return [7 - coordinates[0], coordinates[1]]
+
+
 def translateMove(move):
     rank = outputDictFile[str(move[1])]
     file = str(move[0] + 1)

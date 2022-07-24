@@ -1,7 +1,8 @@
 import time
 import pygame
 from board import Board
-from utilsMain import moveRelay, flipTeam
+from utils import coordinatesToScreen
+from utilsMain import moveRelay
 
 
 pygame.init()
@@ -81,8 +82,17 @@ def main():
                 if e.key == pygame.K_z:  # z keybord to undo
                     board.undoMove()
                 if e.key == pygame.K_w:  # w keybord to show moves
-                    highlightSquare(screen, (255, 140, 0, 200), 1, 1)
-                    time.sleep(0.25)
+                    positions = board.getMobilePiecesPosition(board.team)
+                    for position in positions:
+                        translatedPosition = coordinatesToScreen(position)
+                        highlightSquare(
+                            screen,
+                            (255, 140, 0, 200),
+                            translatedPosition[0],
+                            translatedPosition[1]
+                        )
+                    pygame.display.flip()
+                    time.sleep(0.75)
 
         drawGameBoard(screen, board)
         clock.tick(MAX_FPS)
@@ -133,7 +143,6 @@ def highlightSquare(screen, color, row, column):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
     pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
     screen.blit(shape_surf, rect)
-    pygame.display.flip()
 
 
 if __name__ == "__main__":
