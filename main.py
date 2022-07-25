@@ -14,6 +14,19 @@ IMAGES = {}
 GAME_FONT = pygame.font.Font(pygame.font.get_default_font(), 30)
 
 
+"""
+TODO:
+    - FIX:
+        - the own piece is blocking the sight of the other ones when calculating legal moves
+        - opponent's pawns are not being considered when calculating the king's legal moves
+        - pins to the king
+    - ADD:
+        - castling
+        - en passant
+        - promotion
+"""
+
+
 def loadImages():
     imageNames = [
         "bB", "bK", "bN", "bP", "bQ", "bR",

@@ -1,8 +1,8 @@
 import copy
+from pieces import Empty
 from position import Position
 from resource import Resource
-from utilsBoard import freshBoard, getPawnDiagonal, formatMove
-from pieces import Empty
+from utilsBoard import freshBoard, getPawnDiagonal, formatMove, getOtherTeam
 
 
 class Board(Resource):
@@ -86,14 +86,14 @@ class Board(Resource):
 
     # this functions goes to the piece on the start position and checks if the
     # possible moves it has are legal in respect to the rest of the board
-    def legalMoves(self, startPosition, checkingKing=False):
+    def legalMoves(self, startPosition, checkingKing=False, ignoreKing=False):
         # Need to add the condition so that the king cannot move
         # to check and so that pieces can't move on absolute pins
         piece = self.matrix[startPosition.rank][startPosition.file]
         legalMoves = getPawnDiagonal(self.matrix, piece, startPosition)
         listOfMoves = piece.moves
 
-        if piece.type == "King" and not checkingKing:
+        if piece.type == "King" and not checkingKing and not ignoreKing:
             listOfMoves = self.getKingMoves(listOfMoves, piece.team)
 
         if not piece.team:  # If it is an empty piece
@@ -113,13 +113,14 @@ class Board(Resource):
                     continue
         return legalMoves
 
-    def getMobilePiecesPosition(self, team, checkingKing=False):
+    def getMobilePiecesPosition(self, team, checkingKing=False, ignoreKing=False):
         mobilePieces = []
         for rank in range(0, 8):
             for file in range(0, 8):
                 position = Position(rank, file)
                 piece = self.getPiece(position)
-                if self.legalMoves(position, checkingKing) and piece.team == team:
+                legalMoves = self.legalMoves(position, checkingKing, ignoreKing)
+                if legalMoves and piece.team == team:
                     mobilePieces.append([
                         piece.position.rank,
                         piece.position.file,
@@ -128,21 +129,32 @@ class Board(Resource):
         return mobilePieces
 
     def getOpponentMoves(self, team, checkingKing=False):
-        mobilePiecesPosition = self.getMobilePiecesPosition(team, checkingKing)
+        # Get the opponent's pieces that can move but ignore calculating the
+        # moves that the other king cannot do due to my pieces blocking it
+        mobilePiecesPosition = self.getMobilePiecesPosition(
+            getOtherTeam(team),
+            checkingKing,
+            ignoreKing=True
+        )
         moves = []
         for piecePosition in mobilePiecesPosition:
             piece = self.matrix[piecePosition[0]][piecePosition[1]]
-            moves += piece.moves
+            moves.append(self.legalMoves(piece.position, checkingKing))
         return moves
 
     def getKingMoves(self, listOfMoves, team):
         # This is a function specifically for the king
         allowedMoves = []
-        opponentMoves = self.getOpponentMoves(team, checkingKing=True)
+        opponentMovesList = self.getOpponentMoves(team, checkingKing=True)
         for moves in listOfMoves:
             if not moves:
                 continue
             move = moves[0]
-            if move not in opponentMoves:
+
+            doAppend = True  # If doAppend stays true the move will be appended
+            for opponentMoveList in opponentMovesList:
+                if move in opponentMoveList:
+                    doAppend = False
+            if doAppend:
                 allowedMoves.append([move])
         return allowedMoves

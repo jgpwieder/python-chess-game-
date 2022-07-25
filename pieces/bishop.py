@@ -1,5 +1,5 @@
-from resource import Resource
 from checks import checkTeam
+from resource import Resource
 from utilsMove import topRightMove, topLeftMove, bottomLeftMove, bottomRightMove
 
 
