@@ -1,5 +1,3 @@
-
-
 inputDictRank = {
     "A": 0,
     "B": 1,
@@ -55,6 +53,15 @@ def zfill(value, length):
     return value
 
 
+def movesFromRaysOfMoves(moves):
+    """Transform a list of lists of ray of moves into a list of piece's moves"""
+    formattedMoves = []
+    for rayOfMoves in moves:
+        for move in rayOfMoves:
+            formattedMoves.append(move)
+    return formattedMoves
+
+
 def formatBoard(matrix):
     result = ["    A        B        C        D        E        F        G        H"]
     for rank in range(0, 8):
@@ -73,3 +80,36 @@ def formatBoard(matrix):
     result.append("    A        B        C        D        E        F        G        H")
     result.reverse()
     return result
+
+
+def getDistanceFromStart(targetElement, elementList):
+    index = 0
+    for el in elementList:
+        if el == targetElement:
+            return index
+        index += 1
+    return None
+
+
+def splitList(targetElement, elementList):
+    index = 0
+    for element in elementList:
+        if element == targetElement:
+            return elementList[0:index], elementList[index + 1:]
+        index += 1
+    return []
+
+
+def splitListBetween(targetElement1, targetElement2, elementList):
+    distance1 = getDistanceFromStart(targetElement1, elementList)
+    distance2 = getDistanceFromStart(targetElement2, elementList)
+    if not distance1 or not distance2:
+        return []
+    if distance1 < distance2:
+        returnList = splitList(targetElement1, elementList)[1]
+        returnList = splitList(targetElement2, returnList)[0]
+        return returnList
+
+    returnList = splitList(targetElement2, elementList)[1]
+    returnList = splitList(targetElement1, returnList)[0]
+    return returnList

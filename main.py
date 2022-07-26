@@ -1,7 +1,7 @@
 import time
 import pygame
 from board import Board
-from utils import coordinatesToScreen
+from utils import coordinatesToScreen, movesFromRaysOfMoves
 from utilsMain import moveRelay
 
 
@@ -16,11 +16,19 @@ GAME_FONT = pygame.font.Font(pygame.font.get_default_font(), 30)
 
 """
 TODO:
+    - TARGET:
+        - Pinned pieces cannot eat the opponent's piece that is pinning it
+        - Pawns are note being considered under a pin
+        - moves away from the opponent's piece pinning another are not being considered when calculating pins
+        
     - FIX:
         - the own piece is blocking the sight of the other ones when calculating legal moves
         - opponent's pawns are not being considered when calculating the king's legal moves
-        - pins to the king
+        - pins to the king -> TARGET
+        
     - ADD:
+        - king cant eat protected pieces
+        - block checks
         - castling
         - en passant
         - promotion
@@ -78,24 +86,24 @@ def main():
 
                     # highlight the pieces that the places that the highlighted piece can go
                     startPosition = moveRelay(playerClicks[0])
-                    legalMoves = board.legalMoves(startPosition)
+                    legalMoves = movesFromRaysOfMoves(board.legalMoves(startPosition))
                     if legalMoves:
                         for move in legalMoves:
                             translatedMove = coordinatesToScreen(move)
                             highlightSquare(
                                 screen,
-                                (0, 191, 255, 100),
+                                (0, 191, 255, 150),
                                 translatedMove[0],
                                 translatedMove[1]
                             )
                         pygame.display.flip()
-                        time.sleep(0.3)
+                        time.sleep(0.38)
 
                 if len(playerClicks) == 2:  # if this is the second input, make a move
                     startPosition = moveRelay(playerClicks[0])
                     endPosition = moveRelay(playerClicks[1])  # flip rows of positions
 
-                    legalMoves = board.legalMoves(startPosition)
+                    legalMoves = movesFromRaysOfMoves(board.legalMoves(startPosition))
                     if [endPosition.rank, endPosition.file] not in legalMoves:
                         printMessage(screen, "Invalid Move")
                         squareSelected = ()
@@ -126,7 +134,7 @@ def main():
                 if e.key == pygame.K_e:  # e keybord to show all possible moves for a piece:
                     if len(playerClicks) == 1:
                         startPosition = moveRelay(playerClicks[0])
-                        legalMoves = board.legalMoves(startPosition)
+                        legalMoves = movesFromRaysOfMoves(board.legalMoves(startPosition))
                         if legalMoves:
                             for move in legalMoves:
                                 translatedMove = coordinatesToScreen(move)

@@ -1,4 +1,4 @@
-from checks import checkMoveBoundary
+from checks import checkMoveBoundary, checkMovesBoundary
 from pieces import Empty, Pawn, Rook, Horse, Bishop, King, Queen
 from position import Position
 from utils import translateMove
@@ -68,26 +68,26 @@ def getPawnDiagonal(matrix, piece, position):
         if checkMoveBoundary(move):
             rightPiece = matrix[rank + 1][file + 1]
             if rightPiece.team == otherTeam:
-                legalMoves.append(move)
+                legalMoves.append([move])
 
         move = [rank + 1, file - 1]
         if checkMoveBoundary(move):
             leftPiece = matrix[rank + 1][file - 1]
             if leftPiece.team == otherTeam:
-                legalMoves.append(move)
+                legalMoves.append([move])
 
     if piece.type == "Pawn" and piece.team == "Black":
         move = [rank - 1, file + 1]
         if checkMoveBoundary(move):
             rightPiece = matrix[rank - 1][file + 1]
             if rightPiece.team == otherTeam:
-                legalMoves.append(move)
+                legalMoves.append([move])
 
         move = [rank - 1, file - 1]
         if checkMoveBoundary(move):
             leftPiece = matrix[rank - 1][file - 1]
             if leftPiece.team == otherTeam:
-                legalMoves.append(move)
+                legalMoves.append([move])
     return legalMoves
 
 
@@ -98,3 +98,33 @@ def getOtherTeam(team):
     if not team:
         return None
     return otherTeam
+
+
+def buildLine(opponentRayOfMoves):
+    if len(opponentRayOfMoves) < 2:
+        return []
+    move1 = opponentRayOfMoves[0]
+    move2 = opponentRayOfMoves[1]
+
+    # If it is not a diagonal ray of move:
+    if move1[0] == move2[0]:
+        rank = move1[0]
+        return [[rank, 0], [rank, 1], [rank, 2], [rank, 3], [rank, 4], [rank, 5], [rank, 6], [rank, 7]]
+    if move1[1] == move2[1]:
+        file = move1[1]
+        return [[0, file], [1, file], [2, file], [3, file], [4, file], [5, file], [6, file], [7, file]]
+
+    # If it is a diagonal move to/from the top right (add|subtract one to both rank and file):
+    moveToTopRight = [move1[0] + 1, move1[1] + 1]
+    moveFomTopRight = [move1[0] - 1, move1[1] - 1]
+    if move2 == moveToTopRight or move2 == moveFomTopRight:
+        line = []
+        for adder in range(-7, +8):
+            line.append([move1[0] + adder, move1[1] + adder])
+        return checkMovesBoundary(line)
+
+    # else, it is a move in to or from the top left:
+    line = []
+    for adder in range(-7, +8):
+        line.append([move1[0] - adder, move1[1] + adder])
+    return checkMovesBoundary(line)
