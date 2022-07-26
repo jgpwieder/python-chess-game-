@@ -27,7 +27,7 @@ TODO:
         - pins to the king -> TARGET
         
     - ADD:
-        - king cant eat protected pieces
+        - king cant eat protected pieces -> TARGET ACHIEVED
         - block checks
         - castling
         - en passant

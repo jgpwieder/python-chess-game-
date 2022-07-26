@@ -169,22 +169,35 @@ class Board(Resource):
         return moves
 
     def getKingMoves(self, listOfMoves, team):
-        # This is a function specifically for the king
         allowedMoves = []
-        # get a list of lists from a list of lists of lists
         opponentMovesList = movesFromRaysOfMoves(self.getOpponentMoves(team))
         for moves in listOfMoves:
             if not moves:
                 continue
             move = moves[0]
 
-            doAppend = True  # If doAppend stays true the move will be appended
-            for opponentMoveList in opponentMovesList:
+            doAppend = True
+            for opponentMoveList in opponentMovesList: 
                 if move in opponentMoveList:
                     doAppend = False
+
+            if self.isProtected(move, team):
+                doAppend = False
+
             if doAppend:
                 allowedMoves.append([move])
         return allowedMoves
+
+    def isProtected(self, move, team):
+        copyBoard = copy.deepcopy(self)
+        # Set the position of the move empty and see if it is in the list of opponent's moves:
+        copyBoard.matrix[move[0]][move[1]] = Empty(Position(move[0], move[1]))
+        opponentMoves = copyBoard.getOpponentMoves(team)
+        for pieceMoves in opponentMoves:
+            for rayOfMoves in pieceMoves:
+                if [move[0], move[1]] in rayOfMoves:
+                    return True
+        return False
 
     def checkForPins(self, startPosition, moves):
         if not moves:
