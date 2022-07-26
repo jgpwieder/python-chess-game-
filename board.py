@@ -207,14 +207,16 @@ class Board(Resource):
         kPosition = self.getTeamKingPosition()
         kingPosition = [kPosition.rank, kPosition.file]
         opponentMovesList = self.getOpponentMoves(self.team)
+
         # For every ray of opponent's moves, check if the ray contains the piece you want to
         # move and the king, if it does the piece is pinned.
         for opponentPiecesMoves in opponentMovesList:  # opponentPiecesMoves = [[rayOfMove1, rayOfMove2]]
             for opponentRayOfMoves in opponentPiecesMoves:
                 line = buildLine(opponentRayOfMoves)
                 if piecePosition in opponentRayOfMoves:
-                    # Check for pieces between the king and the piece, if there are piece is free to move:
-                    if self.piecesBlockingKing(line, kingPosition, piecePosition):
+                    # Check for pieces between the king and the attacking piece, if there is, the piece is free to move:
+                    print(opponentRayOfMoves)
+                    if self.piecesBlockingKing(line, kingPosition, opponentRayOfMoves[0], piecePosition):
                         return False, []
 
                     if kingPosition in line:
@@ -230,12 +232,12 @@ class Board(Resource):
                         return True, [legalMoves]
         return False, []
 
-    def piecesBlockingKing(self, line, kingPosition, piecePosition):
+    def piecesBlockingKing(self, line, kingPosition, attackingPiecePosition, piecePosition):
         betweenPiecesPosition = []
-        betweenPositions = splitListBetween(kingPosition, piecePosition, line)
+        betweenPositions = splitListBetween(kingPosition, attackingPiecePosition, line)
 
         for position in betweenPositions:
             piece = self.matrix[position[0]][position[1]]
-            if piece.representation != "--":
+            if piece.representation != "--" and position != piecePosition:
                 betweenPiecesPosition.append(position)
         return betweenPiecesPosition

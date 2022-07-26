@@ -103,13 +103,22 @@ def splitList(targetElement, elementList):
 def splitListBetween(targetElement1, targetElement2, elementList):
     distance1 = getDistanceFromStart(targetElement1, elementList)
     distance2 = getDistanceFromStart(targetElement2, elementList)
-    if not distance1 or not distance2:
+
+    if distance1 is None or distance2 is None:
         return []
     if distance1 < distance2:
-        returnList = splitList(targetElement1, elementList)[1]
-        returnList = splitList(targetElement2, returnList)[0]
+        returnList = splitList(targetElement1, elementList)
+        if len(returnList) > 1:
+            returnList = returnList[1]
+        returnList = splitList(targetElement2, returnList)
+        if len(returnList) > 1:
+            returnList = returnList[0]
         return returnList
 
-    returnList = splitList(targetElement2, elementList)[1]
-    returnList = splitList(targetElement1, returnList)[0]
+    returnList = splitList(targetElement2, elementList)
+    if len(returnList) > 1:
+        returnList = returnList[1]
+    returnList = splitList(targetElement1, returnList)
+    if len(returnList) > 1:
+        returnList = returnList[0]
     return returnList
