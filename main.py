@@ -24,14 +24,17 @@ TODO:
     - FIX:
         - the own piece is blocking the sight of the other ones when calculating legal moves
         - opponent's pawns are not being considered when calculating the king's legal moves
+        - king can't capture a piece that is checking it
         - pins to the king -> TARGET
+        - move functions that don't need to be in the board class. ex: king exclusive.
+            - look at other files too: utilsBoard -> getPawnDiagonal
         
     - ADD:
         - king cant eat protected pieces -> TARGET ACHIEVED
         - block checks
         - castling
         - en passant
-        - promotion
+        - option to promote to a knight
 """
 
 

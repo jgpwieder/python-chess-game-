@@ -22,12 +22,13 @@ def getPossibleMoves(position):
 
 class Queen(Resource):
     
-    def __init__(self, position, team):
+    def __init__(self, position, team, isPromoted=False):
         self.position = position
         self.team = checkTeam(team)
         self.moves = getPossibleMoves(position)
         self.type = "Queen"
         self.representation = team[0].lower() + "Q"
+        self.isPromoted = isPromoted
         
     def recalculateMoves(self):
         self.moves = getPossibleMoves(self.position)
