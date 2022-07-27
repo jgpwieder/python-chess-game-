@@ -26,11 +26,27 @@ class Pawn(Resource):
     """
 
     def __init__(self, position, team):
-        self.position = position
+        self._position = position
         self.team = checkTeam(team)
         self.moves = getPossibleMoves(position, team)
-        self.type = "Pawn"
+        self._type = "Pawn"
         self.representation = team[0].lower() + "P"
+
+    @property
+    def position(self):
+        return self._position
+
+    @property
+    def type(self):
+        return self._type
+
+    @position.setter
+    def position(self, position):
+        if position.rank == 7 and self.team == "White":
+            self._type = "Promoted"
+        if position.rank == 0 and self.team == "Black":
+            self._type = "Promoted"
+        self._position = position
 
     def recalculateMoves(self):
         self.moves = getPossibleMoves(self.position, self.team)

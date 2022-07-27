@@ -1,5 +1,5 @@
 import copy
-from pieces import Empty
+from pieces import Empty, Queen, Pawn
 from position import Position
 from resource import Resource
 from utils import movesFromRaysOfMoves, splitListBetween
@@ -68,6 +68,9 @@ class Board(Resource):
         movedPiece.position = endPosition
         capturedPiece = self.matrix[endPosition.rank][endPosition.file]
 
+        if movedPiece.type == "Promoted":
+            movedPiece = Queen(endPosition, movedPiece.team, isPromoted=True)
+
         # Empty the startPosition and set the end position:
         self.matrix[startPosition.rank][startPosition.file] = Empty(startPosition)
         self.matrix[endPosition.rank][endPosition.file] = movedPiece
@@ -87,6 +90,9 @@ class Board(Resource):
     def undoMove(self):
         if len(self.moveLog) != 0:
             movedPiece = self.movedPieces.pop()
+            if movedPiece.type == "Queen" and movedPiece.isPromoted:
+                movedPiece = Pawn(movedPiece.position, movedPiece.team)
+
             capturedPiece = self.capturedPieces.pop()
             self.matrix[movedPiece.position.rank][movedPiece.position.file] = movedPiece
             self.matrix[capturedPiece.position.rank][capturedPiece.position.file] = capturedPiece
@@ -215,7 +221,6 @@ class Board(Resource):
                 line = buildLine(opponentRayOfMoves)
                 if piecePosition in opponentRayOfMoves:
                     # Check for pieces between the king and the attacking piece, if there is, the piece is free to move:
-                    print(opponentRayOfMoves)
                     if self.piecesBlockingKing(line, kingPosition, opponentRayOfMoves[0], piecePosition):
                         return False, []
 
